@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Users
 from .serializers import CreateUserSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from . import util
 
@@ -40,7 +41,12 @@ def create_user(request):
     }
     if serializer.is_valid():
         user = serializer.save()  # save to user db
-        response_data['data'] = {'Success': user.id}
+        refresh = RefreshToken.for_user(user)
+
+        response_data['data'] = {
+                                    'refresh': str(refresh),
+                                    'access': str(refresh.access_token),
+                                }
         response_status = status.HTTP_200_OK
     else:
         response_data['error'] = serializer.errors
