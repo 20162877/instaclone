@@ -44,12 +44,32 @@ def create_user(request):
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])   # Not allowed for anonymous user
+@permission_classes([IsAuthenticated])  # Not allowed for anonymous user
 def user_list(request):
-
     print("Request User -> ", request.user)
     print('Fetching all users from user profile')
     user = UserProfile.objects.all()  # Fetch all records from Userprofile table
     print("Done")
     serialized_data = UserProfileSerializer(instance=user, many=True)  #
     return Response(serialized_data.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_user(request, pk):
+    user = UserProfile.objects.filter(id=pk).first()  # first return none if records not found
+    serialized_data = UserProfileSerializer(instance=user)  #
+    if user:
+        response = {
+            'error': None,
+            'data': serialized_data.data
+        }
+        response_status = status.HTTP_200_OK
+    else:
+        response = {
+            'error': "User Does not exist",
+            'data': None
+        }
+        response_status = status.HTTP_400_BAD_REQUEST
+    return Response(response, response_status)
