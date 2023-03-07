@@ -73,3 +73,9 @@ def get_user(request, pk):
         }
         response_status = status.HTTP_400_BAD_REQUEST
     return Response(response, response_status)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def update_user(request):
+
