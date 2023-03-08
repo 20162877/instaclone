@@ -114,7 +114,7 @@ class UserNetworkEdgeView(CreateModelMixin, GenericAPIView):
     def get(self, request):
         pass
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs): # To follow user
         print("Request --> ", request.data)
         print("request.user.profile.id --> ", request.user.profile.id )
         print("request.user.profile --> ", request.user.profile)
@@ -123,7 +123,7 @@ class UserNetworkEdgeView(CreateModelMixin, GenericAPIView):
         request.data['from_user'] = request.user.profile.id
         return self.create(request, *args, **kwargs)  # Saves request.data to NetworkEdge model
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs): # To unfollow user
         # Token will give identity of user who is trying to unfollow
         # Id of the user being unfollowed can be supplied from body
         network_edge = NetworkEdge.objects.filter(from_user=request.user.profile, to_user=request.data['to_user'])
