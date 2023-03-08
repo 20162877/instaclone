@@ -9,5 +9,6 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='login_api'),
     path('list/', views.user_list, name='user_list_api'),
     path('<int:pk>', views.get_user, name='get_user_api'),
-    path('update_user_profile', views.update_user)
+    path('update_user_profile/', views.update_user, name='update_user_profile_api'),
+    path('edge/', views.UserNetworkEdgeView.as_view(), name='edge_api')
 ]

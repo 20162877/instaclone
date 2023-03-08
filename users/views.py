@@ -3,11 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User, UserProfile
-from .serializers import CreateUserSerializer, UserProfileSerializer
+from .models import User, UserProfile, NetworkEdge
+from .serializers import CreateUserSerializer, UserProfileSerializer, UpdateUserProfileSerializer, \
+    NetworkEdgeCreationSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin, ListModelMixin, \
+    RetrieveModelMixin
+from rest_framework.generics import GenericAPIView
 
 
 @api_view(['POST'])
@@ -74,8 +78,58 @@ def get_user(request, pk):
         response_status = status.HTTP_400_BAD_REQUEST
     return Response(response, response_status)
 
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update_user(request):
+    # UserProfile.object.filer(name=request.user)  related_name  ==== request.user.profile  Reverse relationship
+    print("Request User --> ", request.data)
+    print("Views --> 83")
+    user_update_profile = UpdateUserProfileSerializer(instance=request.user.profile, data=request.data)
+    print("Views --> 85")
+    if user_update_profile.is_valid():
+        user_profile = user_update_profile.save()
+        response = {
+            "data": UserProfileSerializer(instance=user_profile).data,
+            "error": None
+        }
+        response_status = status.HTTP_200_OK
+    else:
+        response = {
+            "data": user_update_profile.errors,
+            "error": None
+        }
+        response_status = status.HTTP_400_BAD_REQUEST
 
+    return Response(response, response_status)
+
+
+class UserNetworkEdgeView(CreateModelMixin, GenericAPIView):
+    authentication_classes = [JWTAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
+    queryset = NetworkEdge.objects.all()
+    serializer_class = NetworkEdgeCreationSerializer
+
+    def get(self, request):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        print("Request --> ", request.data)
+        print("request.user.profile.id --> ", request.user.profile.id )
+        print("request.user.profile --> ", request.user.profile)
+        print("request.user --> ", request.user)
+
+        request.data['from_user'] = request.user.profile.id
+        return self.create(request, *args, **kwargs)  # Saves request.data to NetworkEdge model
+
+    def delete(self, request, *args, **kwargs):
+        # Token will give identity of user who is trying to unfollow
+        # Id of the user being unfollowed can be supplied from body
+        network_edge = NetworkEdge.objects.filter(from_user=request.user.profile, to_user=request.data['to_user'])
+        if network_edge.exists():
+            network_edge.delete()
+            message = "User Unfollowed"
+        else:
+            message = "No edge found"
+        return Response({'Data': None, 'message':message}, status=status.HTTP_200_OK)

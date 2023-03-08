@@ -23,7 +23,24 @@ class TimeStamp(models.Model):
 
 class UserProfile(TimeStamp):
     DEFAULT_PIC_URL = "https://placeholde.png"
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name='profile')
     default_pic_url = models.CharField(max_length=50, default=DEFAULT_PIC_URL)
     bio = models.CharField(max_length=20, blank=True)
     is_verified = models.BooleanField(default=True)
+
+
+# A--->B
+# B--->A
+# A--->C
+# B--->C
+# user_a  Who does user_a follow?
+# Network.object.filter(from_user=user_a)
+# user_a.following.all() --> [B,C]  --> two edges
+
+class NetworkEdge(TimeStamp):
+    from_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="following")
+    to_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="follower")
+
+    class Meta:
+        unique_together = ('from_user', 'to_user', )   # Data won't be insert for same value, if database already has same value
+
