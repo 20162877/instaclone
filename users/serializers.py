@@ -24,25 +24,34 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'first_name', 'last_name', 'email', 'password',)
 
 
-class UserProfileViewSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=200)
-    first_name = serializers.CharField(max_length=200)
-    last_name = serializers.CharField(max_length=200)
+class UserProfileViewSerializer(serializers.ModelSerializer):
+    # username = serializers.CharField(max_length=200)
+    # first_name = serializers.CharField(max_length=200)
+    # last_name = serializers.CharField(max_length=200)
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', )
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserProfileViewSerializer()
+    follower_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
-        fields = ('default_pic_url', 'bio', 'user', 'created_on', 'last_update',)
+        fields = ('default_pic_url', 'bio', 'user', 'created_on', 'last_update', 'follower_count', 'following_count', )
+        # exclude = ('id', 'is_verified')
+    def get_follower_count(self,obj):
+        return obj.follower.count()
+    def get_following_count(self,obj):
+        return obj.following.count()
 
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-
-    print("serializer --> 44")
 
     def update(self, instance, validated_data):  # instance refer to Model.UserProfile
         user = instance.user
@@ -54,14 +63,25 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    print("serializer --> 55")
-
     class Meta:
         model = UserProfile
         fields = ('first_name', 'last_name')
 
 
 class NetworkEdgeCreationSerializer(serializers.ModelSerializer):
+    """
+        Serializer Contains follow and follower
+    """
+
     class Meta:
         model = NetworkEdge
         fields = ('from_user', 'to_user',)
+
+
+class NetworkEdgeViewSerializer(serializers.ModelSerializer):
+    from_user = UserProfileSerializer()
+    to_user = UserProfileSerializer()
+
+    class Meta:
+        model = NetworkEdge
+        fields = ('from_user', 'to_user', )

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User, UserProfile, NetworkEdge
 from .serializers import CreateUserSerializer, UserProfileSerializer, UpdateUserProfileSerializer, \
-    NetworkEdgeCreationSerializer
+    NetworkEdgeCreationSerializer, NetworkEdgeViewSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -50,6 +50,7 @@ def create_user(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])  # Not allowed for anonymous user
 def user_list(request):
+    """ Get list of users """
     print("Request User -> ", request.user)
     print('Fetching all users from user profile')
     user = UserProfile.objects.all()  # Fetch all records from Userprofile table
@@ -62,6 +63,7 @@ def user_list(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_user(request, pk):
+    """ GEt user profile """
     user = UserProfile.objects.filter(id=pk).first()  # first return none if records not found
     serialized_data = UserProfileSerializer(instance=user)  #
     if user:
@@ -84,6 +86,7 @@ def get_user(request, pk):
 @permission_classes([IsAuthenticated])
 def update_user(request):
     # UserProfile.object.filer(name=request.user)  related_name  ==== request.user.profile  Reverse relationship
+    """ Update User details such as First Name and Last Name """
     print("Request User --> ", request.data)
     print("Views --> 83")
     user_update_profile = UpdateUserProfileSerializer(instance=request.user.profile, data=request.data)
@@ -105,25 +108,68 @@ def update_user(request):
     return Response(response, response_status)
 
 
-class UserNetworkEdgeView(CreateModelMixin, GenericAPIView):
+class UserNetworkEdgeView(CreateModelMixin,
+                          ListModelMixin,
+                          GenericAPIView):
+    """
+    follow, unfollow and list of all follower.
+    """
     authentication_classes = [JWTAuthentication, ]
     permission_classes = [IsAuthenticated, ]
     queryset = NetworkEdge.objects.all()
     serializer_class = NetworkEdgeCreationSerializer
 
-    def get(self, request):
-        pass
+    def get_serializer_class(self):
+        """
+        Uses NetworkEdgeViewSerializer class when get request is called
+        """
+        # Change the serializer in case follower are being requested.
+        if self.request.method == 'GET':
+            return NetworkEdgeViewSerializer
+        return self.serializer_class
+    
+    def get_queryset(self):
+        edge_direction = self.request.query_params['direction']
+        # NetworkEdge.objects.all().filter(to_user=self.request.user.profile)
+        print("Request --> ", self.request.user.profile)
+        print("Request --> ", self.request.user)
+        print("Request  ", self.request)
+        if edge_direction == 'followers':
+            return self.queryset.filter(to_user=self.request.user.profile)
+        elif edge_direction == 'following':
+            return self.queryset.filter(from_user=self.request.user.profile)
 
-    def post(self, request, *args, **kwargs): # To follow user
-        print("Request --> ", request.data)
-        print("request.user.profile.id --> ", request.user.profile.id )
-        print("request.user.profile --> ", request.user.profile)
-        print("request.user --> ", request.user)
+    def get(self, request, *args, **kwargs):
+        """
+        List all follower of given user
+        """
+        print("request --> 143")
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """
+        To follow user
+        {
+        to_user:2
+        }
+        request.user.profile.id(Token user) followed 2
+        """
+        # print("Request --> ", request.data)
+        # print("request.user.profile.id --> ", request.user.profile.id)
+        # print("request.user.profile --> ", request.user.profile)
+        # print("request.user --> ", request.user)
 
         request.data['from_user'] = request.user.profile.id
         return self.create(request, *args, **kwargs)  # Saves request.data to NetworkEdge model
 
-    def delete(self, request, *args, **kwargs): # To unfollow user
+    def delete(self, request, *args, **kwargs):
+        """
+        Unfollow user
+        {
+        to_user:2
+        }
+        request.user.profile(token) unfollowed 2
+        """
         # Token will give identity of user who is trying to unfollow
         # Id of the user being unfollowed can be supplied from body
         network_edge = NetworkEdge.objects.filter(from_user=request.user.profile, to_user=request.data['to_user'])
@@ -132,4 +178,4 @@ class UserNetworkEdgeView(CreateModelMixin, GenericAPIView):
             message = "User Unfollowed"
         else:
             message = "No edge found"
-        return Response({'Data': None, 'message':message}, status=status.HTTP_200_OK)
+        return Response({'Data': None, 'message': message}, status=status.HTTP_200_OK)
