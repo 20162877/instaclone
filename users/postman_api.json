@@ -1,0 +1,86 @@
+[
+    {
+        "from_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "mohd",
+                "first_name": "",
+                "last_name": ""
+            },
+            "created_on": "2023-03-15T11:54:32.368590Z",
+            "last_update": "2023-03-15T11:54:32.368603Z",
+            "follower_count": 0,
+            "following_count": 3
+        },
+        "to_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "ujaif",
+                "first_name": "ujaif",
+                "last_name": "Ahmad"
+            },
+            "created_on": "2023-03-07T13:28:58.936605Z",
+            "last_update": "2023-03-07T13:28:58.936623Z",
+            "follower_count": 2,
+            "following_count": 0
+        }
+    },
+    {
+        "from_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "mohd",
+                "first_name": "",
+                "last_name": ""
+            },
+            "created_on": "2023-03-15T11:54:32.368590Z",
+            "last_update": "2023-03-15T11:54:32.368603Z",
+            "follower_count": 0,
+            "following_count": 3
+        },
+        "to_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "naved",
+                "first_name": "naved",
+                "last_name": "Ahmad"
+            },
+            "created_on": "2023-03-07T13:46:30.257203Z",
+            "last_update": "2023-03-07T13:46:30.257216Z",
+            "follower_count": 2,
+            "following_count": 2
+        }
+    },
+    {
+        "from_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "mohd",
+                "first_name": "",
+                "last_name": ""
+            },
+            "created_on": "2023-03-15T11:54:32.368590Z",
+            "last_update": "2023-03-15T11:54:32.368603Z",
+            "follower_count": 0,
+            "following_count": 3
+        },
+        "to_user": {
+            "default_pic_url": "https://placeholde.png",
+            "bio": "",
+            "user": {
+                "username": "ahmad",
+                "first_name": "Ajay",
+                "last_name": "Singh"
+            },
+            "created_on": "2023-03-08T11:57:30.906621Z",
+            "last_update": "2023-03-08T12:14:20.065855Z",
+            "follower_count": 2,
+            "following_count": 1
+        }
+    }
+]

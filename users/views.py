@@ -86,7 +86,7 @@ def get_user(request, pk):
 @permission_classes([IsAuthenticated])
 def update_user(request):
     # UserProfile.object.filer(name=request.user)  related_name  ==== request.user.profile  Reverse relationship
-    """ Update User details such as First Name and Last Name """
+    """ Update User details such as First Name, Last Name and profile_pic"""
     print("Request User --> ", request.data)
     print("Views --> 83")
     user_update_profile = UpdateUserProfileSerializer(instance=request.user.profile, data=request.data)

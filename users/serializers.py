@@ -41,7 +41,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('default_pic_url', 'bio', 'user', 'created_on', 'last_update', 'follower_count', 'following_count', )
+        fields = ('profile_pic_url', 'bio', 'user', 'created_on', 'last_update', 'follower_count', 'following_count', )
         # exclude = ('id', 'is_verified')
     def get_follower_count(self,obj):
         return obj.follower.count()
@@ -59,13 +59,14 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
         user.last_name = validated_data.pop('last_name', None)
         user.save()
 
-        # instance.bio = validated_data.get('bio', None)
+        instance.bio = validated_data.get('bio', None)
+        instance.profile_pic_url = validated_data.get('profile_pic_url', None)
         instance.save()
         return instance
 
     class Meta:
         model = UserProfile
-        fields = ('first_name', 'last_name')
+        fields = ('first_name', 'last_name', 'bio', 'profile_pic_url', )
 
 
 class NetworkEdgeCreationSerializer(serializers.ModelSerializer):

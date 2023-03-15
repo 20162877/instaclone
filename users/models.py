@@ -22,10 +22,10 @@ class TimeStamp(models.Model):
 
 
 class UserProfile(TimeStamp):
-    DEFAULT_PIC_URL = "https://placeholde.png"
+    #DEFAULT_PIC_URL = "https://placeholde.png"
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name='profile')
-    default_pic_url = models.CharField(max_length=50, default=DEFAULT_PIC_URL)
     bio = models.CharField(max_length=20, blank=True)
+    profile_pic_url = models.ImageField(upload_to='profile_pic/', blank=True)
     is_verified = models.BooleanField(default=True)
 
 
