@@ -22,7 +22,7 @@ class TimeStamp(models.Model):
 
 
 class UserProfile(TimeStamp):
-    #DEFAULT_PIC_URL = "https://placeholde.png"
+    # DEFAULT_PIC_URL = "https://placeholde.png"
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, related_name='profile')
     bio = models.CharField(max_length=20, blank=True)
     profile_pic_url = models.ImageField(upload_to='profile_pic/', blank=True)
@@ -42,5 +42,5 @@ class NetworkEdge(TimeStamp):
     to_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="follower")
 
     class Meta:
-        unique_together = ('from_user', 'to_user', )   # Data won't be insert for same value, if database already has same value
-
+        # Data won't be insert for same value, if database already has same value
+        unique_together = ('from_user', 'to_user',)
